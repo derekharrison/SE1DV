@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
     s_data solver_data;
 
     /* Parameters */
-    domain_data.Nx = 19;                            //Number of nodes along x axis, should be an odd number
+    domain_data.Nx = 19;                           //Number of nodes along x axis, should be an odd number
     domain_data.Nt = 20;                           //Number of timesteps
     domain_data.L = 1.0;                           //Length of domain
 
