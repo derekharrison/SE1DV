@@ -30,11 +30,11 @@ int main(int argc, char* argv[]) {
 
     /* Parameters */
     domain_data.Nx = 39;                           //Number of nodes along x axis, should be an odd number
-    domain_data.Nt = 600;                          //Number of timesteps
+    domain_data.Nt = 1200;                          //Number of timesteps
     domain_data.L = 15.0;                          //Length of domain
 
     time_data.to = 0.0;                            //Initial time
-    time_data.tf = 30.5;                           //Final time
+    time_data.tf = 61.0;                           //Final time
 
     physical_params.h = 1.0;                       //Constant
     physical_params.m = 1.0;                       //Mass of particle

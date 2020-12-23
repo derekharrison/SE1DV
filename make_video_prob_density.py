@@ -18,26 +18,14 @@ Nt = np.genfromtxt(file_timesteps, unpack=True)
 file_limits = 'limits.txt'
 max_real, min_real, max_im, min_im, L, max_pd = np.genfromtxt(file_limits, unpack=True)
 
-max_val = 0
-min_val = 0
-if(max_real > max_im):
-    max_val = max_real
-else:
-    max_val = max_im
-
-if(min_real < min_im):
-    min_val = min_real
-else:
-    min_val = min_im
-
 def animate(i):
-    my_file = 'psi_vs_t_' + str(i) + '.txt'
+    my_file = 'pd_vs_t_' + str(i) + '.txt'
     print(i)
     fig.clear()
-    x_c, psi_real, psi_im = np.genfromtxt(my_file, unpack=True)
-    ax = plt.axes(xlim=(-0.5*L, 0.5*L), ylim=(min_im, max_im))
-    cont = plt.plot(x_c, psi_real)
-    cont = plt.plot(x_c, psi_im)
+    x_c, pd_real, pd_im = np.genfromtxt(my_file, unpack=True)
+    ax = plt.axes(xlim=(-0.5*L, 0.5*L), ylim=(0.0, max_pd))
+    cont = plt.plot(x_c, pd_real)
+    cont = plt.plot(x_c, pd_im)
     
     return cont
 
@@ -46,6 +34,6 @@ anim = manimation.FuncAnimation(fig, animate, frames=size_t, repeat=False)
 
 print("Done Animation, start saving")
 
-anim.save('SE_solution.mp4', writer=writer, dpi=200)
+anim.save('prob_density_solution.mp4', writer=writer, dpi=200)
     
 print("--- %s seconds ---" % (time.time() - start_time))

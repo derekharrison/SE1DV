@@ -48,6 +48,7 @@ void solver(d_data domain_data,
     Complex* psip = new Complex[Nx];
     Complex* psi_prev = new Complex[Nx];
     Complex* psipo = new Complex[Nx];
+    Complex* prob_density = new Complex[Nx];
 
     /* Start calculations */
     Complex i(0,1);
@@ -62,6 +63,8 @@ void solver(d_data domain_data,
         psip[j].b = 0.0;
         psipo[j].a = psi_init.a;
         psipo[j].b = psi_init.b;
+        prob_density[j].a = 0.0;
+        prob_density[j].b = 0.0;
         solver_data->x_c[j] = j*d_x - 0.5*L + 0.5*d_x;
     }
 
@@ -70,6 +73,7 @@ void solver(d_data domain_data,
     double min_real = 1e+8;
     double max_im = -1e+8;
     double min_im = 1e+8;
+    double max_pd = -1e+8;
     while(t < tf){
         /* Start Gauss-Seidel iterations */
         int it = 0;
@@ -196,9 +200,17 @@ void solver(d_data domain_data,
         for(int j = 0; j < Nx; ++j) {
         	Complex psip_conj(psip[j].a, -psip[j].b);
         	integral = integral + (psip[j]*psip_conj);
+        	prob_density[j] = psip[j]*psip_conj;
         }
 
         printf("integral psi*psi: %f\n", integral.a);
+
+        /* Calculate max prob density */
+        for(int j = 0; j < Nx; ++j) {
+        	if(prob_density[j].a > max_pd) {
+        		max_pd = prob_density[j].a;
+        	}
+        }
 
         /* Check convergence */
         solver_data->error_real = 0.0;
@@ -211,7 +223,7 @@ void solver(d_data domain_data,
         solver_data->error_real /= Nx;
         solver_data->error_im /= Nx;
 
-        /* Export data */
+        /* Export psi data */
         std::ofstream myfile;
         std::string file_prefix = "psi_vs_t_";
         std::string time_step = std::to_string(timestep);
@@ -221,6 +233,17 @@ void solver(d_data domain_data,
             myfile << solver_data->x_c[j] << " " << psip[j].a << " " << psip[j].b << "\n";
         }
         myfile.close();
+
+        /* Export probability density data */
+        std::ofstream myfile_pd;
+        std::string file_prefix_pd = "pd_vs_t_";
+        std::string time_step_pd = std::to_string(timestep);
+        std::string file_name_pd = file_prefix_pd + time_step_pd + ".txt";
+        myfile_pd.open(file_name_pd);
+        for(int j = 0; j < Nx; ++j) {
+        	myfile_pd << solver_data->x_c[j] << " " << prob_density[j].a << " " << prob_density[j].b << "\n";
+        }
+        myfile_pd.close();
 
         /* Update old timestep values */
         for(int j = 0; j < Nx; ++j) {
@@ -247,7 +270,8 @@ void solver(d_data domain_data,
     		    << min_real << " "
     		    << max_im << " "
     		    << min_im << " "
-    		    << L;
+    		    << L << " "
+    		    << max_pd;
     file_limits.close();
 
     /* Set solver results */
