@@ -5,6 +5,8 @@ GridX.txt
 GridY.txt
 GridZ.txt
 heat3D.txt
+*.txt
+*mp4
 T_alongx_atyz.gnumeric
 T_alongx_atyz.txt
 T_alongx_atyz_verification.gnumeric

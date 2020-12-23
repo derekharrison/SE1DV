@@ -17,7 +17,7 @@
 
 double V(double x, double t) {
 	/* potential */
-	double k = 1.0;
+	double k = 0.1;
 	return 0.5*k*x*x;
 }
 
@@ -29,12 +29,12 @@ int main(int argc, char* argv[]) {
     s_data solver_data;
 
     /* Parameters */
-    domain_data.Nx = 19;                           //Number of nodes along x axis, should be an odd number
-    domain_data.Nt = 20;                           //Number of timesteps
-    domain_data.L = 1.0;                           //Length of domain
+    domain_data.Nx = 39;                           //Number of nodes along x axis, should be an odd number
+    domain_data.Nt = 600;                          //Number of timesteps
+    domain_data.L = 15.0;                          //Length of domain
 
     time_data.to = 0.0;                            //Initial time
-    time_data.tf = 1.5;                            //Final time
+    time_data.tf = 30.5;                           //Final time
 
     physical_params.h = 1.0;                       //Constant
     physical_params.m = 1.0;                       //Mass of particle

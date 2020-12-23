@@ -7,6 +7,8 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <fstream>
+#include <string>
 #include "complex.hpp"
 #include "main.hpp"
 #include "user_types.hpp"
@@ -63,6 +65,11 @@ void solver(d_data domain_data,
         solver_data->x_c[j] = j*d_x - 0.5*L + 0.5*d_x;
     }
 
+    int timestep = 0;
+    double max_real = -1e+8;
+    double min_real = 1e+8;
+    double max_im = -1e+8;
+    double min_im = 1e+8;
     while(t < tf){
         /* Start Gauss-Seidel iterations */
         int it = 0;
@@ -154,6 +161,45 @@ void solver(d_data domain_data,
             it++;
         }
 
+        /* Calculate min and max */
+        for(int j = 0; j < Nx; ++j) {
+        	if(psip[j].a > max_real) {
+        		max_real = psip[j].a;
+        	}
+        	if(psip[j].b > max_im) {
+        		max_im = psip[j].b;
+        	}
+        	if(psip[j].a < min_real) {
+        		min_real = psip[j].a;
+        	}
+        	if(psip[j].b < min_im) {
+        		min_im = psip[j].b;
+        	}
+        }
+
+        /* Normalize */
+        Complex norm_const(0,0);
+        for(int j = 0; j < Nx; ++j) {
+        	Complex psip_conj(psip[j].a, -psip[j].b);
+        	norm_const = norm_const + (psip[j]*psip_conj);
+        }
+
+        for(int j = 0; j < Nx; ++j) {
+        	psip[j].a /= sqrt(norm_const.a);
+        	psip[j].b /= sqrt(norm_const.a);
+        	psi_prev[j].a /= sqrt(norm_const.a);
+        	psi_prev[j].b /= sqrt(norm_const.a);
+        }
+
+        /* Check integral */
+        Complex integral(0,0);
+        for(int j = 0; j < Nx; ++j) {
+        	Complex psip_conj(psip[j].a, -psip[j].b);
+        	integral = integral + (psip[j]*psip_conj);
+        }
+
+        printf("integral psi*psi: %f\n", integral.a);
+
         /* Check convergence */
         solver_data->error_real = 0.0;
         solver_data->error_im = 0.0;
@@ -165,6 +211,17 @@ void solver(d_data domain_data,
         solver_data->error_real /= Nx;
         solver_data->error_im /= Nx;
 
+        /* Export data */
+        std::ofstream myfile;
+        std::string file_prefix = "psi_vs_t_";
+        std::string time_step = std::to_string(timestep);
+        std::string file_name = file_prefix + time_step + ".txt";
+        myfile.open(file_name);
+        for(int j = 0; j < Nx; ++j) {
+            myfile << solver_data->x_c[j] << " " << psip[j].a << " " << psip[j].b << "\n";
+        }
+        myfile.close();
+
         /* Update old timestep values */
         for(int j = 0; j < Nx; ++j) {
             psipo[j].a = psip[j].a;
@@ -172,7 +229,26 @@ void solver(d_data domain_data,
         }
 
         t = t + d_t;
+        timestep++;
     }
+
+    /* Export number of timesteps */
+    std::ofstream file_timestep;
+    std::string file_name = "number_of_timesteps.txt";
+    file_timestep.open(file_name);
+    file_timestep << Nt;
+    file_timestep.close();
+
+    /* Export limits */
+    std::ofstream file_limits;
+    std::string file_name_limits = "limits.txt";
+    file_limits.open(file_name_limits);
+    file_limits << max_real << " "
+    		    << min_real << " "
+    		    << max_im << " "
+    		    << min_im << " "
+    		    << L;
+    file_limits.close();
 
     /* Set solver results */
     for(int j = 0; j < Nx; ++j) {
