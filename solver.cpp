@@ -195,16 +195,6 @@ void solver(d_data domain_data,
         	psi_prev[j].b /= sqrt(norm_const.a);
         }
 
-        /* Check integral */
-        Complex integral(0,0);
-        for(int j = 0; j < Nx; ++j) {
-        	Complex psip_conj(psip[j].a, -psip[j].b);
-        	integral = integral + (psip[j]*psip_conj);
-        	prob_density[j] = psip[j]*psip_conj;
-        }
-
-        printf("integral psi*psi: %f\n", integral.a);
-
         /* Calculate max prob density */
         for(int j = 0; j < Nx; ++j) {
         	if(prob_density[j].a > max_pd) {

@@ -11,6 +11,7 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <time.h>
 #include "complex.hpp"
 #include "solver.hpp"
 #include "user_types.hpp"
@@ -27,14 +28,15 @@ int main(int argc, char* argv[]) {
     p_params physical_params;
     bound_and_psi_init boundaries_and_psi_init;
     s_data solver_data;
+    clock_t t_start = clock();
 
     /* Parameters */
     domain_data.Nx = 39;                           //Number of nodes along x axis, should be an odd number
-    domain_data.Nt = 1200;                          //Number of timesteps
+    domain_data.Nt = 600;                          //Number of timesteps
     domain_data.L = 15.0;                          //Length of domain
 
     time_data.to = 0.0;                            //Initial time
-    time_data.tf = 61.0;                           //Final time
+    time_data.tf = 30.0;                           //Final time
 
     physical_params.h = 1.0;                       //Constant
     physical_params.m = 1.0;                       //Mass of particle
@@ -63,12 +65,14 @@ int main(int argc, char* argv[]) {
                 j, solver_data.x_c[j], j, solver_data.psi[j].a, j, solver_data.psi[j].b);
     }
 
-    printf("error_real: %E\n", solver_data.error_real);
-    printf("error_im: %E\n", solver_data.error_im);
-
     /* Deallocate memory for solver results */
     delete [] solver_data.psi;
     delete [] solver_data.x_c;
+
+    /* Print time taken for execution */
+    clock_t t_end = clock();
+    double sim_time = double (t_end - t_start)/CLOCKS_PER_SEC;
+    printf("time taken: %f\n", sim_time);
 
     return 0;
 }
