@@ -181,11 +181,12 @@ void solver(d_data domain_data,
         	}
         }
 
-        /* Normalize */
+        /* Normalize and compute probability density */
         Complex norm_const(0,0);
         for(int j = 0; j < Nx; ++j) {
         	Complex psip_conj(psip[j].a, -psip[j].b);
         	norm_const = norm_const + (psip[j]*psip_conj);
+        	prob_density[j] = psip[j]*psip_conj;
         }
 
         for(int j = 0; j < Nx; ++j) {
